@@ -1,0 +1,17 @@
+image: node:12.16.2
+
+pipelines:
+  branches:
+    master:
+      - step:
+          caches:
+            - node
+          script:
+            # This gets executed when merging a PR to master branch
+            - tar -pvczf app.gz src/ package.json tsconfig.json Procfile .env
+            - pipe: atlassian/heroku-deploy:1.1.3
+              variables:
+                HEROKU_API_KEY: $HEROKU_API_KEY
+                HEROKU_APP_NAME: $HEROKU_APP_NAME
+                ZIP_FILE: 'app.gz'
+                WAIT: 'true'
